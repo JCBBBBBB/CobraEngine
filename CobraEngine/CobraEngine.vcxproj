@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Color.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Math\Vector2.h" />
   </ItemGroup>

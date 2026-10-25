@@ -21,6 +21,7 @@ public:
 	int GetX() const { return m_x; } // const 붙인 이유 : 함수 안에서 m_x를 변경 못하게
 	int GetY() const { return m_y; } // const 붙인 이유 : 함수 안에서 m_y를 변경 못하게
 
+	//static인 이유는 Right, Up 같은 값이 개별 객체의 상태가 아니라, 모든 코드가 함께 사용할 공통 기준값이기 때문
 	static Vector2 Zero;
 	static Vector2 One;
 	static Vector2 Right;
