@@ -23,10 +23,12 @@
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Math\Color.h" />
     <ClInclude Include="Math\Vector2.h" />
+    <ClInclude Include="ScreenBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Math\Vector2.cpp" />
+    <ClCompile Include="ScreenBuffer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
