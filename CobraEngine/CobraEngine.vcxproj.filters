@@ -24,7 +24,10 @@
     <ClInclude Include="Math\Color.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenBuffer.h">
+    <ClInclude Include="Renderer\Renderer.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\ScreenBuffer.h">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,7 +38,10 @@
     <ClCompile Include="Core\Input.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ScreenBuffer.cpp">
+    <ClCompile Include="Renderer\Renderer.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\ScreenBuffer.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
