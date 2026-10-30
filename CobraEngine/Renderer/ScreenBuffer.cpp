@@ -3,40 +3,32 @@
 
 ScreenBuffer::ScreenBuffer(int width, int height) : m_screenSize(width, height)
 {
-	assert(width > 0 && width <= 32767 && height > 0 && height <= 32767);
 
 	// 이 설정으로 문자 화면 공간을 하나 만들어줘 -> 핸들 저장
 	m_screenBuffer = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, CONSOLE_TEXTMODE_BUFFER, nullptr);
 	assert(m_screenBuffer != INVALID_HANDLE_VALUE); // INVALID_HANDLE_VALUE면 실패
 
-	// 목표 크기를 Windows 자료형으로 준비
-	COORD bufferSize = { static_cast<SHORT>(m_screenSize.GetX()), static_cast<SHORT>(m_screenSize.GetY()) };
-	// 버퍼에서 어느 범위를 보여줄지 정함
-	SMALL_RECT windowRect = { 0, 0, static_cast<SHORT>(bufferSize.X - 1), static_cast<SHORT>(bufferSize.Y - 1) };
-
-	CONSOLE_SCREEN_BUFFER_INFO currentInfo = {}; // 현재 버퍼 크기 저장
-	BOOL result = GetConsoleScreenBufferInfo(m_screenBuffer, &currentInfo); // 이 핸들이 가리키는 버퍼의 현재 크기 currentInfo에 담아줌
+	// 화면 창 크기 설정
+	SMALL_RECT rect = {};
+	rect.Top = 0;
+	rect.Left = 0;
+	rect.Right = static_cast<short>(m_screenSize.GetX() - 1);
+	rect.Bottom = static_cast<short>(m_screenSize.GetY() - 1);
+	BOOL result = SetConsoleWindowInfo(m_screenBuffer, TRUE, &rect);
 	assert(result == TRUE);
 
-	COORD temporarySize = {};
-
-	temporarySize.X = bufferSize.X > currentInfo.dwSize.X ? bufferSize.X : currentInfo.dwSize.X;
-	temporarySize.Y = bufferSize.Y > currentInfo.dwSize.Y ? bufferSize.Y : currentInfo.dwSize.Y;
-
-	result = SetConsoleScreenBufferSize(m_screenBuffer, temporarySize); // 문자를 저장하는 공간을 임시 크기로 변경
-	assert(result == TRUE);
-	result = SetConsoleWindowInfo(m_screenBuffer, TRUE, &windowRect); // 보이는 영역을 목표 범위로 변경
-	assert(result == TRUE);
-	result = SetConsoleScreenBufferSize(m_screenBuffer, bufferSize); // 남는 저장 공간을 목표 크기로 줄임
+	// 화면 버퍼 크기 설정 및 예외 처리
+	COORD coord = {};
+	coord.X = static_cast<short>(m_screenSize.GetX());
+	coord.Y = static_cast<short>(m_screenSize.GetY());
+	result = SetConsoleScreenBufferSize(m_screenBuffer, coord);
 	assert(result == TRUE);
 
-	CONSOLE_CURSOR_INFO cursorInfo = {};
-	result = GetConsoleCursorInfo(m_screenBuffer, &cursorInfo); // 기존 커서 정보 읽기
-	assert(result == TRUE);
-
-	cursorInfo.bVisible = FALSE; // 보이기 여부를 안보이게 처리
-	result = SetConsoleCursorInfo(m_screenBuffer, &cursorInfo); // Windows에 적용
-	assert(result);
+	// 커서 끄기
+	CONSOLE_CURSOR_INFO info;
+	GetConsoleCursorInfo(m_screenBuffer, &info);
+	info.bVisible = FALSE;
+	SetConsoleCursorInfo(m_screenBuffer, &info);
 }
 
 ScreenBuffer::~ScreenBuffer()
@@ -48,14 +40,18 @@ ScreenBuffer::~ScreenBuffer()
 	}
 }
 
-// 숨겨진 버퍼를 공백으로 채움
+// 콘솔을 지우는 함수
+// 공백 문자를 화면 크기 전체에 한번에 설정
 void ScreenBuffer::Clear() const
 {
-	COORD startPosition = {};
-	DWORD writtenCount = 0; // 실제로 쓴 문자 개수
+	// 글자를 채울 시작 위치
+	COORD coord = {};
+
+	// 실제로 쓴 문자 개수
+	DWORD writtenCount = 0;
 
 	// 이 버퍼의 시작 위치부터, 전체 칸에 공백을 써줘. 실제 몇칸 썼는지도 알려줘
-	BOOL result = FillConsoleOutputCharacterA(m_screenBuffer, ' ', m_screenSize.GetX() * m_screenSize.GetY(), startPosition, &writtenCount);
+	BOOL result = FillConsoleOutputCharacterA(m_screenBuffer, ' ', m_screenSize.GetX() * m_screenSize.GetY(), coord, &writtenCount);
 	assert(result == TRUE);
 }
 
@@ -63,15 +59,24 @@ void ScreenBuffer::Clear() const
 void ScreenBuffer::Draw(const CHAR_INFO* data) const
 {
 	// 입력 배열을 가로/세로 몇 칸으로 해석할지 지정
-	COORD bufferSize = { static_cast<SHORT>(m_screenSize.GetX()), static_cast<SHORT>(m_screenSize.GetY()) };
+	COORD bufferSize = {};
+	bufferSize.X = static_cast<SHORT>(m_screenSize.GetX());
+	bufferSize.Y = static_cast<SHORT>(m_screenSize.GetY());
 	
 	// 입력 배열에서 읽기 시작할 좌표 : (0,0)
-	COORD startPosition = {};
+	COORD bufferPosition = {};
+	bufferPosition.X = 0;
+	bufferPosition.Y = 0;
 	
 	// 문자를 기록할 범위
-	SMALL_RECT writeRegion = { 0, 0, static_cast<SHORT>(bufferSize.X - 1), static_cast<SHORT>(bufferSize.Y - 1) };
+	SMALL_RECT writeRegion = {};
+	writeRegion.Top = 0;
+	writeRegion.Left = 0;
+	writeRegion.Bottom = static_cast<SHORT>(m_screenSize.GetY() - 1);
+	writeRegion.Right = static_cast<SHORT>(m_screenSize.GetX() - 1);
+
 
 	// 입력 배열의 문자와 색상을 대상 버퍼의 지정 영역에 복사한다
-	BOOL result = WriteConsoleOutputA(m_screenBuffer, data, bufferSize, startPosition, &writeRegion);
+	BOOL result = WriteConsoleOutputA(m_screenBuffer, data, bufferSize, bufferPosition, &writeRegion);
 	assert(result == TRUE);
 }
