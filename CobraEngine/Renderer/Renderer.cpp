@@ -91,16 +91,17 @@ void Renderer::Draw()
 {
 	// 이전 문자와 우선 순위 제거
 	// 아직 처리하지 않은 요청 목록 유지
-	m_frame->Clear(m_screenSize);
+	m_frame->Clear(m_screenSize);  // 모든 칸 -> 문자 : 공백, 우선순위 : -1
 
 	// 요청으로 Frame을 구성하고 백버퍼에 기록
-	DrawRenderCommands();
+	DrawRenderCommands(); // ex) : "AB"를 (1,1)에 그리기, 우선순위 1 / "..."를 (0,1)에 그리기, 우선순위 0
 
 	// 완성된 백버퍼를 표시하고 다른 버퍼로 변경
 	Present();
 }
 
 // 요청 목록을 읽어 Frame을 구성한 뒤 백버퍼에 기록
+// ex) "AB"를 (1,1)에 그리기, 우선순위 1 / "..."를 (0,1)에 그리기, 우선순위 0
 void Renderer::DrawRenderCommands()
 {
 	// 이번 프레임의 요청을 순서대로 처리

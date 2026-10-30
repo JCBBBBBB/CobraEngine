@@ -30,6 +30,10 @@
     <ClInclude Include="Renderer\ScreenBuffer.h">
       <Filter>Render</Filter>
     </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="TestObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vector2.cpp">
@@ -44,5 +48,9 @@
     <ClCompile Include="Renderer\ScreenBuffer.cpp">
       <Filter>Render</Filter>
     </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TestObject.cpp" />
   </ItemGroup>
 </Project>
