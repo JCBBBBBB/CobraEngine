@@ -14,14 +14,14 @@ ScreenBuffer::ScreenBuffer(int width, int height) : m_screenSize(width, height)
 	rect.Left = 0;
 	rect.Right = static_cast<short>(m_screenSize.GetX() - 1);
 	rect.Bottom = static_cast<short>(m_screenSize.GetY() - 1);
-	BOOL result = SetConsoleWindowInfo(m_screenBuffer, TRUE, &rect);
+	BOOL result = SetConsoleWindowInfo(m_screenBuffer, TRUE, &rect); // 화면에 보여줄 범위 설정
 	assert(result == TRUE);
 
 	// 화면 버퍼 크기 설정 및 예외 처리
 	COORD coord = {};
 	coord.X = static_cast<short>(m_screenSize.GetX());
 	coord.Y = static_cast<short>(m_screenSize.GetY());
-	result = SetConsoleScreenBufferSize(m_screenBuffer, coord);
+	result = SetConsoleScreenBufferSize(m_screenBuffer, coord); // 문자를 저장할 공간의 크기 설정
 	assert(result == TRUE);
 
 	// 커서 끄기
@@ -76,7 +76,7 @@ void ScreenBuffer::Draw(const CHAR_INFO* data) const
 	writeRegion.Right = static_cast<SHORT>(m_screenSize.GetX() - 1);
 
 
-	// 입력 배열의 문자와 색상을 대상 버퍼의 지정 영역에 복사한다
+	// Frame에 완성한 화면을 버퍼로 옮긴다
 	BOOL result = WriteConsoleOutputA(m_screenBuffer, data, bufferSize, bufferPosition, &writeRegion);
 	assert(result == TRUE);
 }
