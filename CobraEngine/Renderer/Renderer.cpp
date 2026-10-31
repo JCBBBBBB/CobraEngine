@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <cassert>
+#include "Actor.h"
 
 Renderer* Renderer::m_instance = nullptr;
 
@@ -99,6 +100,7 @@ void Renderer::Draw()
 	// 완성된 백버퍼를 표시하고 다른 버퍼로 변경
 	Present();
 }
+
 
 // 요청 목록을 읽어 Frame을 구성한 뒤 백버퍼에 기록
 // ex) "AB"를 (1,1)에 그리기, 우선순위 1 / "..."를 (0,1)에 그리기, 우선순위 0

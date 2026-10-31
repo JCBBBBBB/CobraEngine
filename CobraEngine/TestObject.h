@@ -4,6 +4,6 @@
 class TestObject : public Object
 {
 public:
-	static TypeId()
+	//static TypeId()
 };
 

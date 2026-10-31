@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Math\Color.h" />
@@ -29,6 +30,7 @@
     <ClInclude Include="TestObject.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Math\Vector2.cpp" />
     <ClCompile Include="Object.cpp" />

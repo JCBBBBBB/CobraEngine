@@ -10,6 +10,9 @@
     <Filter Include="Render">
       <UniqueIdentifier>{464f1efd-8610-4210-983b-774a8dc59405}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Actor">
+      <UniqueIdentifier>{0aa3da38-774a-46a2-aa75-a5d632980ded}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vector2.h">
@@ -34,6 +37,7 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TestObject.h" />
+    <ClInclude Include="Actor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vector2.cpp">
@@ -52,5 +56,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="TestObject.cpp" />
+    <ClCompile Include="Actor.cpp" />
   </ItemGroup>
 </Project>
