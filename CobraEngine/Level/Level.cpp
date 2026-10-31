@@ -59,20 +59,34 @@ void Level::Draw()
 	}
 }
 
+
+
+
+
 void Level::ProcessAddAndDestroyActors()
 {
 	// 제거 예약된 Actor를 관리 목록에서 뺀다
-	for (auto iter = m_actors.begin(); iter != m_actors.end();)
-	{
-		if ((*iter)->HasExpired())
-		{
-			// erase가 반환한 다음 원소 위치부터 계속 검사한다
-			iter = m_actors.erase(iter);
-			continue; // 바로 그 위치부터 검사 가능
-		}
+	//for (auto iter = m_actors.begin(); iter != m_actors.end();)
+	//{
+	//	if ((*iter)->HasExpired())
+	//	{
+	//		// erase가 반환한 다음 원소 위치부터 계속 검사한다
+	//		iter = m_actors.erase(iter);
+	//		continue; // 바로 그 위치부터 검사 가능
+	//	}
 
-		++iter;
-	}
+	//	++iter;
+	//}
+	const auto newEnd = std::remove_if(
+		m_actors.begin(),
+		m_actors.end(),
+		[](const std::shared_ptr<Actor>& actor)
+		{
+			return actor->HasExpired();
+		}
+	);
+
+	m_actors.erase(newEnd, m_actors.end());
 
 	// 추가 요청된 Actor를 관리 목록에 등록한다
 	for (const std::shared_ptr<Actor>& actor : m_addRequestedActors)

@@ -1,146 +1,270 @@
-﻿#include "Engine/Engine.h"
-#include "Level/Level.h"
-#include "Actor/Actor.h"
-#include "Core/Input.h"
+﻿#include "Actor/Actor.h"
 
 #include <Windows.h>
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <fstream>
 #include <memory>
-#include <string>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
-// 입력에 따라 이동하고 표식을 생성하는 테스트용 Player.
-class Player : public Actor
+using ActorList = std::vector<std::shared_ptr<Actor>>;
+using RemoveFunction = void (*)(ActorList&);
+
+// 수정 전: 제거할 때마다 뒤 원소들을 당긴다.
+// 두 비교 함수의 인라이닝 조건을 맞춘다.
+__declspec(noinline)
+void RemoveBefore(ActorList& actors)
 {
-	TYPE_DECLARATIONS(Player, Actor)
-
-public:
-	Player()
-		: Actor("@", Vector2(3, 3), Color::Yellow)
+	for (auto it = actors.begin(); it != actors.end();)
 	{
-		// 바닥과 표식보다 위에 표시한다.
-		m_sortingOrder = 1;
+		if ((*it)->HasExpired())
+		{
+			it = actors.erase(it);
+			continue;
+		}
+
+		++it;
 	}
+}
 
-	void Tick(float deltaTime) override
-	{
-		Input& input = Input::Get();
-
-		// 종료 요청.
-		if (input.GetKeyDown(VK_ESCAPE))
-		{
-			QuitGame();
-			return;
-		}
-
-		// 방향키를 새로 누를 때마다 한 칸 이동한다.
-		Vector2 nextPosition = GetPosition();
-
-		if (input.GetKeyDown(VK_LEFT))
-		{
-			nextPosition = nextPosition + Vector2::Left;
-		}
-
-		if (input.GetKeyDown(VK_RIGHT))
-		{
-			nextPosition = nextPosition + Vector2::Right;
-		}
-
-		if (input.GetKeyDown(VK_UP))
-		{
-			nextPosition = nextPosition + Vector2::Up;
-		}
-
-		if (input.GetKeyDown(VK_DOWN))
-		{
-			nextPosition = nextPosition + Vector2::Down;
-		}
-
-		// 위 두 줄은 안내 문구 영역으로 남긴다.
-		// 화면 안의 좌표일 때만 위치를 변경한다.
-		if (nextPosition.GetX() >= 0 &&
-			nextPosition.GetX() < Engine::Get().GetWidth() &&
-			nextPosition.GetY() >= 2 &&
-			nextPosition.GetY() < Engine::Get().GetHeight())
-		{
-			SetPosition(nextPosition);
-		}
-
-		// 표식이 없으면 현재 위치에 하나 생성한다.
-		if (input.GetKeyDown(VK_SPACE) && m_marker.expired())
-		{
-			std::shared_ptr<Level> level = GetOwner();
-
-			if (level)
-			{
-				m_marker = level->SpawnActor<Actor>(
-					"*",
-					GetPosition(),
-					Color::Cyan
-				);
-			}
-		}
-
-		// 현재 표식을 제거 예약한다.
-		if (input.GetKeyDown('X'))
-		{
-			std::shared_ptr<Actor> marker = m_marker.lock();
-
-			if (marker)
-			{
-				marker->Destroy();
-				m_marker.reset();
-			}
-		}
-	}
-
-private:
-	// 표식의 실제 소유자는 Level이다.
-	// Player는 표식을 찾아갈 약한 참조만 보관한다.
-	std::weak_ptr<Actor> m_marker;
-};
-
-// 테스트 장면을 구성하는 Level.
-class GameLevel : public Level
+// 수정 후: 생존 원소를 모으고 뒤 구간을 한 번에 제거한다.
+__declspec(noinline)
+void RemoveAfter(ActorList& actors)
 {
-public:
-	void OnInitialized() override
+	const auto newEnd = std::remove_if(
+		actors.begin(),
+		actors.end(),
+		[](const std::shared_ptr<Actor>& actor)
+		{
+			return actor->HasExpired();
+		}
+	);
+
+	actors.erase(newEnd, actors.end());
+}
+
+// 목록 준비 → 제거 시간 측정 → 결과 검증.
+double MeasureOnce(
+	int actorCount,
+	int removalPercent,
+	RemoveFunction removeFunction,
+	LONGLONG frequency)
+{
+	ActorList actors;
+	actors.reserve(actorCount);
+
+	// 검증용 주소만 저장한다.
+	// shared_ptr가 아니므로 Actor의 소멸을 막지 않는다.
+	std::vector<const Actor*> expectedSurvivors;
+	expectedSurvivors.reserve(actorCount);
+
+	// 준비 과정은 측정 시간에 포함하지 않는다.
+	for (int i = 0; i < actorCount; ++i)
 	{
-		// 레벨 초기화 완료 상태를 기록한다.
-		Level::OnInitialized();
+		auto actor = std::make_shared<Actor>();
 
-		SpawnActor<Player>();
+		const bool shouldRemove =
+			removalPercent == 100 ||
+			(removalPercent == 50 && i % 2 == 1);
 
-		SpawnActor<Actor>(
-			"CobraEngine Integration Test",
-			Vector2(1, 0),
-			Color::White
-		);
+		if (shouldRemove)
+		{
+			actor->Destroy();
+		}
+		else
+		{
+			expectedSurvivors.push_back(actor.get());
+		}
 
-		SpawnActor<Actor>(
-			"Arrows: Move | Space: Mark | X: Remove | ESC: Quit",
-			Vector2(1, 1),
-			Color::White
-		);
-
-		// Player와 겹치는 바닥.
-		// 기본 우선순위는 0이므로 Player를 가리지 않는다.
-		SpawnActor<Actor>(
-			std::string(Engine::Get().GetWidth(), '.'),
-			Vector2(0, 3),
-			Color::Green
-		);
+		actors.push_back(std::move(actor));
 	}
+
+	LARGE_INTEGER start = {};
+	LARGE_INTEGER end = {};
+
+	QueryPerformanceCounter(&start);
+
+	// 이 호출만 측정한다.
+	removeFunction(actors);
+
+	QueryPerformanceCounter(&end);
+
+	// 검증 과정도 측정 시간에 포함하지 않는다.
+	if (actors.size() != expectedSurvivors.size())
+	{
+		throw std::runtime_error("Survivor count mismatch.");
+	}
+
+	for (std::size_t i = 0; i < actors.size(); ++i)
+	{
+		if (actors[i].get() != expectedSurvivors[i])
+		{
+			throw std::runtime_error("Survivor order mismatch.");
+		}
+	}
+
+	return static_cast<double>(end.QuadPart - start.QuadPart)
+		* 1000.0
+		/ static_cast<double>(frequency);
+}
+
+// 측정값을 정렬한 후 가운데 값을 구한다.
+double Median(std::vector<double> values)
+{
+	std::sort(values.begin(), values.end());
+
+	const std::size_t middle = values.size() / 2;
+
+	if (values.size() % 2 == 0)
+	{
+		return (values[middle - 1] + values[middle]) / 2.0;
+	}
+
+	return values[middle];
+}
+
+struct Sample
+{
+	int actorCount;
+	int removalPercent;
+	int trial;
+
+	double beforeMs;
+	double afterMs;
 };
 
 int main()
 {
-	// Input과 Renderer를 생성한다.
-	Engine engine;
+	try
+	{
+		LARGE_INTEGER frequency = {};
 
-	// 첫 번째로 실행할 레벨을 요청한다.
-	engine.AddNewLevel<GameLevel>();
+		if (!QueryPerformanceFrequency(&frequency) ||
+			frequency.QuadPart <= 0)
+		{
+			throw std::runtime_error("Timer initialization failed.");
+		}
 
-	// 입력·업데이트·그리기를 반복한다.
-	engine.Run();
+		constexpr int warmupCount = 5;
+		constexpr int repeatCount = 30;
+
+		const int actorCounts[] = { 1000, 10000 };
+		const int removalPercents[] = { 0, 50, 100 };
+
+		std::vector<Sample> samples;
+		samples.reserve(2 * 3 * repeatCount);
+
+		std::cout << std::fixed << std::setprecision(6);
+
+		for (int actorCount : actorCounts)
+		{
+			for (int removalPercent : removalPercents)
+			{
+				// 초기 실행의 영향을 줄이기 위한 준비 실행.
+				for (int i = 0; i < warmupCount; ++i)
+				{
+					MeasureOnce(
+						actorCount, removalPercent,
+						RemoveBefore, frequency.QuadPart
+					);
+
+					MeasureOnce(
+						actorCount, removalPercent,
+						RemoveAfter, frequency.QuadPart
+					);
+				}
+
+				std::vector<double> beforeTimes;
+				std::vector<double> afterTimes;
+
+				beforeTimes.reserve(repeatCount);
+				afterTimes.reserve(repeatCount);
+
+				for (int trial = 0; trial < repeatCount; ++trial)
+				{
+					double beforeMs = 0.0;
+					double afterMs = 0.0;
+
+					// 항상 같은 방식이 먼저 실행되지 않도록 번갈아 측정.
+					if (trial % 2 == 0)
+					{
+						beforeMs = MeasureOnce(
+							actorCount, removalPercent,
+							RemoveBefore, frequency.QuadPart
+						);
+
+						afterMs = MeasureOnce(
+							actorCount, removalPercent,
+							RemoveAfter, frequency.QuadPart
+						);
+					}
+					else
+					{
+						afterMs = MeasureOnce(
+							actorCount, removalPercent,
+							RemoveAfter, frequency.QuadPart
+						);
+
+						beforeMs = MeasureOnce(
+							actorCount, removalPercent,
+							RemoveBefore, frequency.QuadPart
+						);
+					}
+
+					beforeTimes.push_back(beforeMs);
+					afterTimes.push_back(afterMs);
+
+					samples.push_back({
+						actorCount,
+						removalPercent,
+						trial + 1,
+						beforeMs,
+						afterMs
+						});
+				}
+
+				std::cout
+					<< "Actors=" << actorCount
+					<< ", Remove=" << removalPercent << "%"
+					<< ", Before=" << Median(beforeTimes) << " ms"
+					<< ", After=" << Median(afterTimes) << " ms"
+					<< '\n';
+			}
+		}
+
+		// 모든 측정이 끝난 뒤 파일에 저장한다.
+		std::ofstream file("ActorRemovalBenchmark.csv");
+
+		if (!file)
+		{
+			throw std::runtime_error("Cannot create CSV file.");
+		}
+
+		file << "actor_count,removal_percent,trial,before_ms,after_ms\n";
+		file << std::fixed << std::setprecision(6);
+
+		for (const Sample& sample : samples)
+		{
+			file
+				<< sample.actorCount << ','
+				<< sample.removalPercent << ','
+				<< sample.trial << ','
+				<< sample.beforeMs << ','
+				<< sample.afterMs << '\n';
+		}
+
+		std::cout
+			<< "\nAll count/order checks passed.\n"
+			<< "Saved: ActorRemovalBenchmark.csv\n";
+	}
+	catch (const std::exception& error)
+	{
+		std::cerr << error.what() << '\n';
+		return 1;
+	}
 
 	return 0;
 }
