@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Core.h"
-#include "Object.h"
+#include "Core/Object.h"
 #include "Math/Vector2.h"
 #include "Math/Color.h"
 #include <string>

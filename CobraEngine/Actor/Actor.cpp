@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include "Renderer/Renderer.h"
+#include "Level.h"
 
 // 위치/문자/색상 저장
 Actor::Actor(const std::string& image, const Vector2& position, Color color)
@@ -22,6 +23,7 @@ void Actor::Tick(float deltaTime)
 {
 	// 구체적인 업데이트 동작은 자식 클래스에서 구현한다
 }
+
 
 // Actor가 저장한 정보를 Renderer에 전달
 void Actor::Draw()

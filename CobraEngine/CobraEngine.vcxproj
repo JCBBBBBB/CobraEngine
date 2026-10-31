@@ -19,24 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
+    <ClInclude Include="Actor\Actor.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Input.h" />
+    <ClInclude Include="Core\Object.h" />
+    <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Math\Color.h" />
     <ClInclude Include="Math\Vector2.h" />
-    <ClInclude Include="Object.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Renderer\ScreenBuffer.h" />
-    <ClInclude Include="TestObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="Core\Input.cpp" />
+    <ClCompile Include="Core\Object.cpp" />
+    <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Math\Vector2.cpp" />
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />
     <ClCompile Include="Renderer\ScreenBuffer.cpp" />
-    <ClCompile Include="TestObject.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -34,7 +34,7 @@ public:
 
 		if (object->Is(T::TypeId()))
 		{
-			return std::static_pointer_cast<T>(object)
+			return std::static_pointer_cast<T>(object);
 		}
 		else
 		{

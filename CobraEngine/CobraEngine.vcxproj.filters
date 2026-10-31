@@ -13,6 +13,9 @@
     <Filter Include="Actor">
       <UniqueIdentifier>{0aa3da38-774a-46a2-aa75-a5d632980ded}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{5c70ba86-5ef9-4b6d-baea-27284ed0d825}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vector2.h">
@@ -33,11 +36,15 @@
     <ClInclude Include="Renderer\ScreenBuffer.h">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
+    <ClInclude Include="Core\Object.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="TestObject.h" />
-    <ClInclude Include="Actor.h" />
+    <ClInclude Include="Actor\Actor.h">
+      <Filter>Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Level</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vector2.cpp">
@@ -52,10 +59,14 @@
     <ClCompile Include="Renderer\ScreenBuffer.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
+    <ClCompile Include="Core\Object.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="TestObject.cpp" />
-    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Actor\Actor.cpp">
+      <Filter>Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

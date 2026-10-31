@@ -1,6 +1,6 @@
 #include "Renderer.h"
 #include <cassert>
-#include "Actor.h"
+#include "Actor/Actor.h"
 
 Renderer* Renderer::m_instance = nullptr;
 
