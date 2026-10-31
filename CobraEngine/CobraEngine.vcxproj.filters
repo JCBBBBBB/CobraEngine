@@ -33,12 +33,6 @@
     <ClInclude Include="Math\Color.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer\Renderer.h">
-      <Filter>Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer\ScreenBuffer.h">
-      <Filter>Render</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Object.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -51,6 +45,12 @@
     <ClInclude Include="Engine\Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Render\Renderer.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\ScreenBuffer.h">
+      <Filter>Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vector2.cpp">
@@ -58,12 +58,6 @@
     </ClCompile>
     <ClCompile Include="Core\Input.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\Renderer.cpp">
-      <Filter>Render</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer\ScreenBuffer.cpp">
-      <Filter>Render</Filter>
     </ClCompile>
     <ClCompile Include="Core\Object.cpp">
       <Filter>Core</Filter>
@@ -76,6 +70,12 @@
     </ClCompile>
     <ClCompile Include="Engine\Engine.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Renderer.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\ScreenBuffer.cpp">
+      <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
