@@ -1,6 +1,7 @@
 #include "Actor.h"
 #include "Renderer/Renderer.h"
-#include "Level.h"
+#include "Level/Level.h"
+#include "Engine/Engine.h"
 
 // 위치/문자/색상 저장
 Actor::Actor(const std::string& image, const Vector2& position, Color color)
@@ -44,6 +45,13 @@ void Actor::Destroy()
 	// 객체 삭제가 아니라 제거 요청을 표시한다
 	m_hasExpired = true;
 }
+
+// Engine에 게임 종료 요청
+void Actor::QuitGame()
+{
+	Engine::Get().Quit();
+}
+
 
 std::shared_ptr<Level> Actor::GetOwner()
 {

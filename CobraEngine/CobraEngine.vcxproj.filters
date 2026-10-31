@@ -16,6 +16,9 @@
     <Filter Include="Level">
       <UniqueIdentifier>{5c70ba86-5ef9-4b6d-baea-27284ed0d825}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{15cd7f0e-62e2-483c-98e6-a141c8482540}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\Vector2.h">
@@ -45,6 +48,9 @@
     <ClInclude Include="Level\Level.h">
       <Filter>Level</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\Vector2.cpp">
@@ -67,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Engine.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

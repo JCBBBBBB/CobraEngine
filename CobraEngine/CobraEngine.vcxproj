@@ -23,6 +23,7 @@
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\Object.h" />
+    <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Math\Color.h" />
     <ClInclude Include="Math\Vector2.h" />
@@ -33,6 +34,7 @@
     <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Core\Object.cpp" />
+    <ClCompile Include="Engine\Engine.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Math\Vector2.cpp" />
     <ClCompile Include="Renderer\Renderer.cpp" />

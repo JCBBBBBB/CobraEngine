@@ -29,6 +29,9 @@ public:
 	// 즉시 삭제하지 않고 제거 대상으로 표시
 	void Destroy();
 
+	// Engine에 게임 종료를 요청한다
+	void QuitGame();
+
 	// 자신을 관리하는 Level을 얻는다
 	// Level이 없거나 이미 소멸했다면 nullptr을 반환한다
 	std::shared_ptr<Level> GetOwner();
