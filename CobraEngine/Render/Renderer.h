@@ -42,7 +42,7 @@ private:
 	void Present();
 
 private:
-	Vector2 m_screenSize;
+	Vector2 m_screenSize; // 화면 사이즈
 	int m_backBufferIndex = 1; // 다음 화면을 작성할 버퍼의 배열 인덱스 
 	static Renderer* m_instance;
 
